@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TouchGrass AI – Offline Outdoor Adventure Planner</title>
+  <meta name="description" content="Generate personalized outdoor missions with local open-weight AI. Less scrolling, more exploring.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20size=%22100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Ambient Nature Glow -->
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-top-right"></div>
+  <div class="ambient-glow glow-bottom"></div>
+
+  <!-- Main Application Wrapper -->
+  <div class="app-container" id="appContainer">
+    
+    <!-- Top Navigation / Status Header -->
+    <header class="app-header">
+      <div class="brand-badge">
+        <span class="brand-icon">🌱</span>
+        <span class="brand-text">TouchGrass AI</span>
+        <span class="hacktoberfest-pill">Hacktoberfest W1 • Touch Grass</span>
+      </div>
+
+      <div class="ollama-status-badge" id="ollamaStatusBadge">
+        <span class="status-dot dot-checking" id="statusDot"></span>
+        <span class="status-label" id="statusLabel">Checking Local AI...</span>
+        <button class="status-refresh-btn" id="refreshStatusBtn" title="Recheck Ollama" aria-label="Recheck Ollama status">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Ollama Offline Alert Notice (Hidden by default, shown if Ollama is unreachable) -->
+    <div class="offline-banner hidden" id="ollamaOfflineBanner">
+      <div class="offline-banner-icon">⚠️</div>
+      <div class="offline-banner-content">
+        <h4>Local AI is not running yet</h4>
+        <p>To run 100% locally with open-weight intelligence, start Ollama and pull the recommended model:</p>
+        <div class="command-box">
+          <code>ollama run qwen2.5:3b</code>
+          <button class="copy-cmd-btn" id="copyCmdBtn" title="Copy command">Copy</button>
+        </div>
+        <p class="offline-subtext">The app is currently using the built-in offline adventure planner so you can still plan and test missions right now.</p>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-tagline-chip">
+        <span>🍃</span> Less scrolling. More exploring.
+      </div>
+      <h1 class="hero-title">
+        TouchGrass <span class="accent-text">AI</span>
+      </h1>
+      <p class="hero-subtitle">
+        "Let AI plan it. You go outside."
+      </p>
+      <p class="hero-description">
+        Create a personalized outdoor mission using local open-weight AI.
+        Generate your plan, put your phone away, and touch some grass.
+      </p>
+
+      <!-- Quick Demo Presets -->
+      <div class="preset-pills-bar">
+        <span class="presets-label">⚡ Quick Presets:</span>
+        <div class="presets-scroll">
+          <button type="button" class="preset-pill-btn" data-preset="campus">🎓 15m Campus Hunt</button>
+          <button type="button" class="preset-pill-btn" data-preset="neighborhood">🏡 30m Neighborhood</button>
+          <button type="button" class="preset-pill-btn" data-preset="photo">📷 45m Photo Walk</button>
+          <button type="button" class="preset-pill-btn" data-preset="friends">🌲 1h Trail Trek</button>
+          <button type="button" class="preset-pill-btn" data-preset="gardening">🌻 30m Gardening</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area: Form & Mission Results -->
+    <main class="main-layout">
+      
+      <!-- Planner Form Section -->
+      <section class="planner-card" id="plannerSection">
+        <div class="card-header">
+          <div class="header-icon">🧭</div>
+          <div>
+            <h2 class="card-title">Configure Your Outdoor Mission</h2>
+            <p class="card-subtitle">Tell the local AI what you're working with today.</p>
+          </div>
+        </div>
+
+        <form id="missionForm" class="mission-form" novalidate>
+          <div class="form-grid">
+            
+            <!-- 1. Activity Type -->
+            <div class="form-group">
+              <label for="activityInput" class="form-label">
+                <span class="label-icon">🏃</span> Activity Type
+              </label>
+              <div class="select-wrapper">
+                <select id="activityInput" name="activity" class="form-select" required>
+                  <option value="Walking" selected>Walking</option>
+                  <option value="Hiking">Hiking</option>
+                  <option value="Running">Running</option>
+                  <option value="Gardening">Gardening</option>
+                  <option value="Photography">Photography</option>
+                  <option value="Nature exploration">Nature exploration</option>
+                  <option value="Bird watching">Bird watching</option>
+                  <option value="Surprise me">Surprise me</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 2. Time Available -->
+            <div class="form-group">
+              <label for="timeInput" class="form-label">
+                <span class="label-icon">⏱️</span> Time Available
+              </label>
+              <div class="select-wrapper">
+                <select id="timeInput" name="time" class="form-select" required>
+                  <option value="15 minutes">15 minutes</option>
+                  <option value="30 minutes" selected>30 minutes</option>
+                  <option value="45 minutes">45 minutes</option>
+                  <option value="1 hour">1 hour</option>
+                  <option value="2 hours">2 hours</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 3. Energy Level -->
+            <div class="form-group">
+              <label for="energyInput" class="form-label">
+                <span class="label-icon">⚡</span> Energy Level
+              </label>
+              <div class="select-wrapper">
+                <select id="energyInput" name="energy" class="form-select" required>
+                  <option value="Low">Low (Gentle & Mindful)</option>
+                  <option value="Medium" selected>Medium (Moderate & Active)</option>
+                  <option value="High">High (Energetic & Dynamic)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 4. Environment -->
+            <div class="form-group">
+              <label for="environmentInput" class="form-label">
+                <span class="label-icon">🌲</span> Environment
+              </label>
+              <div class="select-wrapper">
+                <select id="environmentInput" name="environment" class="form-select" required>
+                  <option value="Campus">Campus</option>
+                  <option value="Park" selected>Park</option>
+                  <option value="Neighborhood">Neighborhood</option>
+                  <option value="Garden">Garden</option>
+                  <option value="Trail">Trail</option>
+                  <option value="Anywhere outdoors">Anywhere outdoors</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 5. Solo or Group -->
+            <div class="form-group">
+              <label for="companyInput" class="form-label">
+                <span class="label-icon">👥</span> Company
+              </label>
+              <div class="select-wrapper">
+                <select id="companyInput" name="company" class="form-select" required>
+                  <option value="Solo" selected>Solo</option>
+                  <option value="With friends">With friends</option>
+                  <option value="Family">Family</option>
+                  <option value="Run club">Run club</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 6. Interest -->
+            <div class="form-group">
+              <label for="interestInput" class="form-label">
+                <span class="label-icon">🔍</span> Primary Focus
+              </label>
+              <div class="select-wrapper">
+                <select id="interestInput" name="interest" class="form-select" required>
+                  <option value="Nature" selected>Nature</option>
+                  <option value="Fitness">Fitness</option>
+                  <option value="Photography">Photography</option>
+                  <option value="Relaxation">Relaxation</option>
+                  <option value="Exploration">Exploration</option>
+                  <option value="Learning">Learning</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 7. Optional Location / Context Text Box -->
+          <div class="form-group full-width">
+            <label for="contextInput" class="form-label">
+              <span class="label-icon">📍</span> Specific Location / Context <span class="optional-tag">(Optional)</span>
+            </label>
+            <input 
+              type="text" 
+              id="contextInput" 
+              name="context" 
+              class="form-input" 
+              placeholder="e.g. College campus quad with oak trees and small pond"
+              maxlength="200"
+            >
+            <span class="form-hint">Add physical landmarks, terrain clues, or weather notes to tailor the mission.</span>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button type="submit" id="generateBtn" class="primary-btn">
+              <span class="btn-icon">✨</span>
+              <span class="btn-text">Generate My Outdoor Mission</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Loading State Overlay / Indicator -->
+        <div class="loading-state hidden" id="loadingState">
+          <div class="spinner-leaf">🌱</div>
+          <h3 class="loading-title">Synthesizing Outdoor Adventure...</h3>
+          <p class="loading-subtitle" id="loadingTip">Local open-weight model is crafting your screen-free route...</p>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mission Result Section (Populated dynamically) -->
+      <section class="mission-result-section hidden" id="resultSection">
+        
+        <!-- Mission Metadata Header Card -->
+        <div class="mission-hero-card">
+          <div class="mission-badge-row">
+            <span class="badge badge-difficulty" id="badgeDifficulty">Easy</span>
+            <span class="badge badge-duration" id="badgeDuration">30 minutes</span>
+            <span class="badge badge-env" id="badgeEnvironment">Park</span>
+            <span class="badge badge-ai" id="badgeAiModel">Local Qwen 2.5 3B</span>
+          </div>
+
+          <h2 class="mission-title-text" id="missionTitle">30-Minute Campus Nature Detective</h2>
+          <p class="mission-desc-text" id="missionDescription">
+            A focused sensory break between classes to recharge your brain cells and reconnect with the living world.
+          </p>
+
+          <!-- Privacy Guarantee Tag -->
+          <div class="privacy-callout">
+            <span class="privacy-icon">🔒</span>
+            <span id="privacyNoticeText">Processed 100% locally on your machine. Zero cloud trackers. Zero API fees.</span>
+          </div>
+        </div>
+
+        <!-- Mission Details Grid -->
+        <div class="mission-cards-grid">
+          
+          <!-- Steps Card -->
+          <div class="card mission-steps-card">
+            <div class="card-header-sm">
+              <span class="card-icon">👣</span>
+              <h3>Your Outdoor Mission Steps</h3>
+            </div>
+            <p class="card-instruction">Read these once, then lock your device and step outside.</p>
+            <ol class="steps-list" id="stepsList">
+              <!-- Dynamically rendered steps with checkboxes -->
+            </ol>
+          </div>
+
+          <!-- Side Columns: What to Bring, Safety, Screen Off Challenge -->
+          <div class="mission-side-cards">
+            
+            <!-- What to Bring -->
+            <div class="card mini-card bring-card">
+              <div class="card-header-sm">
+                <span class="card-icon">🎒</span>
+                <h3>What To Bring</h3>
+              </div>
+              <p class="mini-card-text" id="whatToBringText">Water bottle and comfortable shoes.</p>
+            </div>
+
+            <!-- Safety Note -->
+            <div class="card mini-card safety-card">
+              <div class="card-header-sm">
+                <span class="card-icon">🛡️</span>
+                <h3>Safety Guidance</h3>
+              </div>
+              <p class="mini-card-text" id="safetyNoteText">Stay aware of your surroundings and stick to marked walkways.</p>
+            </div>
+
+            <!-- Screen-Off Challenge Highlight -->
+            <div class="card mini-card challenge-card">
+              <div class="card-header-sm">
+                <span class="card-icon">📵</span>
+                <h3>Screen-Off Challenge</h3>
+              </div>
+              <p class="mini-card-text challenge-highlight" id="screenOffChallengeText">
+                Lock your phone on silent and leave it in your pocket for the next 30 minutes.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Call to Action: GO OUTSIDE -->
+        <div class="go-outside-cta-card">
+          <div class="cta-content">
+            <h3>Ready to disconnect?</h3>
+            <p>The screen has done its job. The real world is right outside your door.</p>
+          </div>
+          <button type="button" class="go-outside-btn" id="goOutsideBtn">
+            <span class="go-icon">🌱</span>
+            <span class="go-label">GO OUTSIDE</span>
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>
+          <strong>TouchGrass AI</strong> — An Open-Weight Outdoor Mission Planner for Hacktoberfest Week 1.
+        </p>
+        <p class="footer-sub">
+          Powered by local open-weight AI (Ollama &amp; Qwen2.5 3B). 100% private, offline-first.
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Zen "Mission Started" Screen-Off Fullscreen Mode -->
+  <div class="zen-mode-overlay hidden" id="zenOverlay">
+    <div class="zen-backdrop"></div>
+    <div class="zen-content">
+      
+      <div class="zen-grass-icon">🌱</div>
+
+      <div class="zen-headers">
+        <h2 class="zen-title">Your mission has started.</h2>
+        <h3 class="zen-subtitle">Put your phone away.</h3>
+        <p class="zen-mantra">Touch grass.</p>
+      </div>
+
+      <!-- Minimal Countdown Timer -->
+      <div class="zen-timer-box">
+        <div class="zen-timer-display" id="zenTimerDisplay">30:00</div>
+        <div class="zen-timer-controls">
+          <button type="button" class="timer-btn" id="zenTimerPauseBtn">Pause</button>
+          <button type="button" class="timer-btn" id="zenTimerResetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="zen-active-mission-pill">
+        <span class="pill-label">Mission:</span>
+        <span class="pill-title" id="zenMissionTitle">30-Minute Campus Nature Detective</span>
+      </div>
+
+      <!-- Quick Steps Accordion/Toggle for quick 5-second glance -->
+      <details class="zen-quick-glance">
+        <summary>👀 Quick 5-Second Steps Glance</summary>
+        <div class="zen-steps-container" id="zenStepsContainer">
+          <!-- Populated from mission -->
+        </div>
+      </details>
+
+      <p class="zen-encouragement">
+        Dim this screen or lock your phone right now. Enjoy the fresh air!
+      </p>
+
+      <button type="button" class="zen-exit-btn" id="zenExitBtn">
+        ← Return to Adventure Planner
+      </button>
+
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
